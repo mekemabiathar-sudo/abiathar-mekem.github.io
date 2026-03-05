@@ -34,28 +34,30 @@ buildSkillBars();
 // ---------- Showcase content (edit here) ----------
 const SHOWCASE = {
   awards: [
-    { img: "assets/awards/award1.jpg", title: "Achievement / Award", desc: "Add a short description here.", meta: "2026" },
-    { img: "assets/awards/award2.jpg", title: "Achievement / Award", desc: "Add a short description here.", meta: "2025" },
-    { img: "assets/awards/award3.jpg", title: "Achievement / Award", desc: "Add a short description here.", meta: "2025" },
+    { img: "award1.jpg", title: "Bachelor Thesis Submission ", desc: "Design and programming of a shuttle vehicle control system for automated high-bay warehouses using Siemens PLC technology.", meta: "2025" },
+    { img: "award2.png", title: "Three-Phase Short Circuit Calculation ", desc: "Simulation of a three-phase short circuit in a power system to analyze fault currents and voltage behavior.", meta: "OTH Regensburg • 2025" },
+    { img: "award3.jpg", title: "Environmental Monitoring Station", desc: "Development of a microcontroller-based system for measuring environmental parameters such as temperature and humidity.", meta: "OTH Regensburg • 2022" },
   ],
   certs: [
-    { img: "assets/certs/cert1.jpg", title: "Certificate", desc: "Course / Provider", meta: "2025" },
-    { img: "assets/certs/cert2.jpg", title: "Certificate", desc: "Course / Provider", meta: "2025" },
-    { img: "assets/certs/cert3.jpg", title: "Certificate", desc: "Course / Provider", meta: "2024" },
+    { img: "cert1.jpg", title: "PCB Design with KiCad", desc: "Introduction to PCB design and routing using KiCad.", meta: "OTH Regensburg • 2023" },
+    { img: "cert2.jpg", title: "PLC Programming Fundamentals", desc: "Introduction to PLC programming, automation basics, ladder logic and function block diagrams.", meta: "SPS4you • 2025" },
+    { img: "cert3.jpg", title: "Advanced PLC Programming", desc: "Advanced PLC programming, automation logic, diagnostics and industrial control systems.", meta: "SPS4you • 2025" },
   ],
   tech: [
-    { icon: "🐍", label: "Python" },
-    { icon: "</>", label: "C" },
-    { icon: "</>", label: "C++" },
-    { icon: "🌐", label: "HTML5" },
-    { icon: "🎨", label: "CSS3" },
-    { icon: "JS", label: "JavaScript" },
-    { icon: "⚙️", label: "TIA Portal" },
-    { icon: "📊", label: "MATLAB" },
-    { icon: "🧠", label: "SQL" },
-    { icon: "🔌", label: "LTspice" },
-    { icon: "🧩", label: "KiCad" },
-    { icon: "🧱", label: "Inventor" },
+    { icon:"🐍", label:"Python" },
+    { icon:"💻", label:"C" },
+    { icon:"💻", label:"C++" },
+    { icon:"🌐", label:"HTML5" },
+    { icon:"🎨", label:"CSS3" },
+    { icon:"🟨", label:"JavaScript" },
+    { icon:"⚙️", label:"TIA Portal" },
+    { icon:"📊", label:"MATLAB / Simulink" },
+    { icon:"🧠", label:"SQL" },
+    { icon:"🔌", label:"LTspice" },
+    { icon:"🧩", label:"KiCad" },
+    { icon:"🧱", label:"Inventor / CAD" },
+    { icon:"⚡", label:"DIgSILENT PowerFactory" },
+    { icon:"🔋", label:"Modelica" }
   ]
 };
 
@@ -113,10 +115,19 @@ tabs.forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)
 
 // ---------- CV Experience (adapté à ton CV + ton message) ----------
 const CV_EXPERIENCE = [
-  {
-    role: "Bachelorand / Werkstudent",
+    {
+    role: "Werkstudent",
     company: "LPlusR GmbH, Parkstein",
-    date: "März 2025 – laufend",
+    date: "August 2025 – laufend",
+    bullets: [
+      "Erstellung einer Fahrzeugsteuerung mit spezifischem Hardwareplan",
+      "Programmierung der Fahrzeugbewegung mittels SCL",
+    ]
+  },
+  {
+    role: "Bachelorand ",
+    company: "LPlusR GmbH, Parkstein",
+    date: "März 2025 – Juli 2025",
     bullets: [
       "Bachelorarbeit: „Konzeption und Programmierung einer Shuttle-Fahrzeugsteuerung im Hochregallager auf Basis einer Siemens-Steuerung“",
       "Erstellung einer Fahrzeugsteuerung mit spezifischem Hardwareplan",
@@ -186,20 +197,41 @@ function renderCvTimeline(){
 }
 renderCvTimeline();
 
-// ---------- Contact form -> mailto ----------
-document.getElementById("contactForm").addEventListener("submit", (e) => {
+// ---------- Contact form -> EmailJS ----------
+document.getElementById("contactForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const fd = new FormData(e.target);
-  const name = fd.get("name");
-  const email = fd.get("email");
-  const subject = fd.get("subject");
-  const message = fd.get("message");
 
-  const mailto = `mailto:mekemabiathar@gmail.com?subject=${encodeURIComponent(subject)}&body=${
-    encodeURIComponent(`From: ${name} <${email}>\n\n${message}`)
-  }`;
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  const oldText = btn.textContent;
 
-  window.location.href = mailto;
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  try {
+    const fd = new FormData(form);
+
+    const params = {
+      from_name: fd.get("name"),
+      reply_to: fd.get("email"),
+      subject: fd.get("subject"),
+      message: fd.get("message"),
+    };
+
+    await emailjs.send("service_td7o1g6", "template_9i0xntg", params);
+
+    btn.textContent = "Sent ✅";
+    form.reset();
+  } catch (err) {
+    console.error("EmailJS error:", err);
+    alert("Message not sent. Please try again or email me directly.");
+    btn.textContent = "Error ❌";
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }, 1500);
+  }
 });
 
 // ---------- i18n ----------
@@ -207,111 +239,234 @@ const langSelect = document.getElementById("langSelect");
 
 const I18N = {
   fr: {
-    nav_home:"Accueil", nav_about:"À propos", nav_skills:"Compétences", nav_showcase:"Portfolio", nav_experience:"Expérience", nav_contact:"Contact",
+    // NAV
+    nav_home: "Accueil",
+    nav_about: "À propos",
+    nav_skills: "Compétences",
+    nav_showcase: "Portfolio",
+    nav_experience: "Expérience",
+    nav_contact: "Contact",
 
-    hero_name:"Abiathar Mekem",
-    hero_role:"Ingénieur électricien • Énergie & Automatisation",
-    hero_text:"Master Énergie & Électromobilité (OTH Regensburg). Toujours Werkstudent chez LPlusR. Projet principal : commande shuttle via Siemens PLC (SCL).",
-    btn_projects:"Voir Portfolio", btn_contact:"Me contacter", btn_cv:"Télécharger le CV",
-    scroll:"Descendre",
+    // HERO
+    hero_name: "Abiathar Mekem",
+    hero_role: "Ingénieur électricien • Réseaux énergétiques • Automatisation • Électromobilité",
+    hero_text:
+      "J’explore l’intersection entre l’ingénierie électrique, les réseaux énergétiques et l’électromobilité à travers des projets concrets et des applications industrielles. Je m’intéresse à la conception et à l’optimisation de systèmes énergétiques intelligents, de solutions d’automatisation et de technologies durables, afin de soutenir la transition vers des infrastructures électriques modernes et efficaces.",
+    btn_projects: "Voir le portfolio",
+    btn_contact: "Me contacter",
+    scroll: "Descendre",
 
-    about_title:"À propos",
-    about_p1:"Je suis ingénieur orienté automatisation industrielle et systèmes énergétiques. J’aime construire une logique PLC robuste, analyser les données et livrer des solutions fiables en environnement industriel.",
-    about_p2:"J’ai terminé mon Bachelor à OTH Regensburg et je fais maintenant un Master en Énergie & Électromobilité. Je travaille toujours comme Werkstudent chez LPlusR, où j’ai aussi réalisé mon sujet de commande shuttle.",
-    stat_degree:"B.Eng", stat_degree_lbl:"Bachelor terminé",
-    stat_master:"M.Sc", stat_master_lbl:"Master en cours",
-    stat_focus:"PLC", stat_focus_lbl:"Focus principal",
+    // ABOUT
+    about_title: "À propos de moi",
+    about_p1:
+      "Je suis diplômé en génie électrique avec un Bachelor en Elektro- und Informationstechnik, spécialisation Énergie et Automatisation. Je poursuis actuellement un Master en Energienetze und Elektromobilität, afin d’approfondir mes compétences en systèmes énergétiques modernes, réseaux électriques et solutions de mobilité durable.",
+    about_p2:
+      "Mes centres d’intérêt portent sur le développement et l’optimisation d’infrastructures énergétiques intelligentes, de systèmes d’automatisation et de technologies innovantes pour des réseaux plus fiables, plus efficaces et plus durables. À travers mes projets académiques et mon expérience en entreprise, j’aime transformer la théorie en solutions applicables au terrain.",
+    about_p3:
+      "En tant que futur ingénieur, je développe continuellement mes compétences techniques, j’explore de nouveaux outils et je renforce ma capacité à concevoir des solutions électriques robustes et performantes. Ce portfolio reflète mon parcours en constante évolution guidé par la passion et l’impact concret.",
 
-    skills_title:"Compétences & Expertise",
-    skills_col1:"Développement", skills_col2:"Ingénierie", skills_col3:"Outils",
+    // STATS (important : 4 cartes différentes)
+    stat_degree: "B.Eng",
+    stat_degree_lbl: "Énergie & automatisation (Bachelor)",
+    stat_master: "M.Sc",
+    stat_master_lbl: "Réseaux & électromobilité (Master)",
+    stat_years: "1+",
+    stat_years_lbl: "Années d’expérience",
+    stat_projects: "5+",
+    stat_projects_lbl: "Projets réalisés",
 
-    showcase_title:"Portfolio Showcase",
-    showcase_sub:"Découvre mes certificats, réalisations et compétences techniques.",
-    tab_awards:"Prix & Réalisations", tab_certs:"Certificats", tab_tech:"Compétences techniques",
+    // SKILLS
+    skills_title: "Compétences & expertise",
+    skills_col1: "Développement",
+    skills_col2: "Ingénierie",
+    skills_col3: "Outils",
 
-    exp_title:"Expérience",
+    // SHOWCASE
+    showcase_title: "Portfolio",
+    showcase_sub: "Découvre mes certificats, réalisations et compétences techniques.",
+    tab_awards: "Réalisations",
+    tab_certs: "Certificats",
+    tab_tech: "Compétences",
 
-    contact_title:"Contact",
-    contact_intro:"Je suis toujours intéressé par de nouveaux projets et opportunités. Si tu as une question ou si tu veux juste dire bonjour, n’hésite pas à me contacter !",
-    lbl_email:"Email", lbl_location:"Lieu", lbl_linkedin:"LinkedIn", lbl_cv:"CV",
-    val_location:"Regensburg, Allemagne", val_linkedin:"Abiathar Mekem", val_cv:"Ouvrir le CV",
-    f_name:"Nom", f_email:"Email", f_subject:"Objet", f_message:"Message", f_send:"Envoyer",
-    ph_name:"Ton nom", ph_email:"Ton email", ph_subject:"Objet", ph_message:"Ton message",
-    f_note:"Ce formulaire ouvre ton application mail (mailto). On pourra connecter un vrai backend plus tard.",
-    rights:"Tous droits réservés.",
-    tagline:"Ingénieur électricien • Énergie • Automatisation • Data",
+    // EXPERIENCE
+    exp_title: "Expérience",
+
+    // CONTACT
+    contact_title: "Contact",
+    contact_intro:
+      "Je suis toujours intéressé par de nouveaux projets et opportunités. Que ce soit pour une question ou simplement pour dire bonjour, n’hésite pas à me contacter !",
+    lbl_email: "Email",
+    lbl_location: "Lieu",
+    lbl_linkedin: "LinkedIn",
+    val_location: "Regensburg, Allemagne",
+    val_linkedin: "Abiathar Mekem",
+    f_name: "Nom",
+    f_email: "Email",
+    f_subject: "Objet",
+    f_message: "Message",
+    f_send: "Envoyer",
+    ph_name: "Ton nom",
+    ph_email: "Ton email",
+    ph_subject: "Objet",
+    ph_message: "Ton message",
+
+    // FOOTER
+    rights: "Tous droits réservés.",
+    tagline: "Ingénieur électricien • Énergie • Automatisation • Électromobilité"
   },
 
   de: {
-    nav_home:"Start", nav_about:"Über mich", nav_skills:"Skills", nav_showcase:"Portfolio", nav_experience:"Erfahrung", nav_contact:"Kontakt",
+    // NAV
+    nav_home: "Start",
+    nav_about: "Über mich",
+    nav_skills: "Skills",
+    nav_showcase: "Portfolio",
+    nav_experience: "Erfahrung",
+    nav_contact: "Kontakt",
 
-    hero_name:"Abiathar Mekem",
-    hero_role:"Elektroingenieur • Energie & Automatisierung",
-    hero_text:"Master Energie & Elektromobilität (OTH Regensburg). Weiterhin Werkstudent bei LPlusR. Fokus: Shuttle-Steuerung mit Siemens PLC (SCL).",
-    btn_projects:"Portfolio ansehen", btn_contact:"Kontakt", btn_cv:"CV herunterladen",
-    scroll:"Runterscrollen",
+    // HERO
+    hero_name: "Abiathar Mekem",
+    hero_role: "Elektroingenieur • Energienetze • Automatisierung • Elektromobilität",
+    hero_text:
+      "Ich erforsche die Schnittstelle zwischen Elektrotechnik, Energienetzen und Elektromobilität durch praxisnahe Projekte und reale Anwendungen. Mein Fokus liegt auf der Entwicklung und Optimierung intelligenter Energiesysteme, Automatisierungslösungen und nachhaltiger Technologien, um den Wandel hin zu modernen und effizienten elektrischen Infrastrukturen zu unterstützen.",
+    btn_projects: "Portfolio ansehen",
+    btn_contact: "Kontakt",
+    scroll: "Runterscrollen",
 
-    about_title:"Über mich",
-    about_p1:"Ich bin Elektroingenieur mit Fokus auf Industrie-Automatisierung und Energiesysteme. Ich entwickle gerne robuste PLC-Logik, analysiere Daten und setze Anforderungen in zuverlässige Lösungen um.",
-    about_p2:"Bachelor an der OTH Regensburg abgeschlossen, aktuell Master Energie & Elektromobilität. Ich arbeite weiterhin als Werkstudent bei LPlusR, wo ich auch mein Shuttle-Thema umgesetzt habe.",
-    stat_degree:"B.Eng", stat_degree_lbl:"Bachelor abgeschlossen",
-    stat_master:"M.Sc", stat_master_lbl:"Master laufend",
-    stat_focus:"PLC", stat_focus_lbl:"Hauptfokus",
+    // ABOUT
+    about_title: "Über mich",
+    about_p1:
+      "Ich habe einen Bachelor in Elektro- und Informationstechnik mit Schwerpunkt Energie- und Automatisierungstechnik. Aktuell studiere ich im Master Energienetze und Elektromobilität, um mein Wissen in modernen Energiesystemen, Stromnetzen und nachhaltiger Mobilität weiter zu vertiefen.",
+    about_p2:
+      "Meine Interessen liegen in der Entwicklung und Optimierung intelligenter Energieinfrastrukturen, Automatisierungssysteme und innovativer Technologien für zuverlässige, effiziente und nachhaltige Netze. Durch Studienprojekte und praktische Arbeit setze ich Theorie gerne in reale Lösungen um.",
+    about_p3:
+      "Als zukünftiger Elektroingenieur erweitere ich kontinuierlich meine technischen Fähigkeiten, lerne neue Tools und stärke meine Kompetenz, robuste und effiziente Lösungen zu entwickeln. Dieses Portfolio zeigt meinen Weg stetig in Entwicklung getragen von Neugier und Zielorientierung.",
 
-    skills_title:"Skills & Expertise",
-    skills_col1:"Development", skills_col2:"Engineering", skills_col3:"Tools",
+    // STATS
+    stat_degree: "B.Eng",
+    stat_degree_lbl: "Energie & Automatisierung ",
+    stat_master: "M.Sc",
+    stat_master_lbl: "Energienetze & Elektromobilität ",
+    stat_years: "1+",
+    stat_years_lbl: "Jahre Erfahrung",
+    stat_projects: "5+",
+    stat_projects_lbl: "Projekte abgeschlossen",
 
-    showcase_title:"Portfolio Showcase",
-    showcase_sub:"Zertifikate, Erfolge und technische Skills auf einen Blick.",
-    tab_awards:"Awards & Erfolge", tab_certs:"Zertifikate", tab_tech:"Technische Skills",
+    // SKILLS
+    skills_title: "Skills & Expertise",
+    skills_col1: "Development",
+    skills_col2: "Engineering",
+    skills_col3: "Tools",
 
-    exp_title:"Erfahrung",
+    // SHOWCASE
+    showcase_title: "Portfolio Showcase",
+    showcase_sub: "Zertifikate, Erfolge und technische Skills auf einen Blick.",
+    tab_awards: "Erfolge",
+    tab_certs: "Zertifikate",
+    tab_tech: "Technische Skills",
 
-    contact_title:"Kontakt",
-    contact_intro:"Ich freue mich immer über neue Projekte und Möglichkeiten. Wenn du eine Frage hast oder einfach Hallo sagen willst, melde dich gerne!",
-    lbl_email:"E-Mail", lbl_location:"Ort", lbl_linkedin:"LinkedIn", lbl_cv:"CV",
-    val_location:"Regensburg, Deutschland", val_linkedin:"Abiathar Mekem", val_cv:"CV öffnen",
-    f_name:"Name", f_email:"E-Mail", f_subject:"Betreff", f_message:"Nachricht", f_send:"Senden",
-    ph_name:"Dein Name", ph_email:"Deine E-Mail", ph_subject:"Betreff", ph_message:"Deine Nachricht",
-    f_note:"Dieses Formular öffnet dein E-Mail-Programm (mailto). Später können wir ein echtes Backend verbinden.",
-    rights:"Alle Rechte vorbehalten.",
-    tagline:"Elektroingenieur • Energie • Automatisierung • Data",
+    // EXPERIENCE
+    exp_title: "Erfahrung",
+
+    // CONTACT
+    contact_title: "Kontakt",
+    contact_intro:
+      "Ich freue mich immer über neue Projekte und Möglichkeiten. Wenn du eine Frage hast oder einfach Hallo sagen willst, melde dich gerne!",
+    lbl_email: "E-Mail",
+    lbl_location: "Ort",
+    lbl_linkedin: "LinkedIn",
+    val_location: "Regensburg, Deutschland",
+    val_linkedin: "Abiathar Mekem",
+    f_name: "Name",
+    f_email: "E-Mail",
+    f_subject: "Betreff",
+    f_message: "Nachricht",
+    f_send: "Senden",
+    ph_name: "Dein Name",
+    ph_email: "Deine E-Mail",
+    ph_subject: "Betreff",
+    ph_message: "Deine Nachricht",
+
+    // FOOTER
+    rights: "Alle Rechte vorbehalten.",
+    tagline: "Elektroingenieur • Energie • Automatisierung • Elektromobilität"
   },
 
   en: {
-    nav_home:"Home", nav_about:"About", nav_skills:"Skills", nav_showcase:"Portfolio", nav_experience:"Experience", nav_contact:"Contact",
+    // NAV
+    nav_home: "Home",
+    nav_about: "About",
+    nav_skills: "Skills",
+    nav_showcase: "Portfolio",
+    nav_experience: "Experience",
+    nav_contact: "Contact",
 
-    hero_name:"Abiathar Mekem",
-    hero_role:"Electrical Engineer • Energy & Automation",
-    hero_text:"M.Sc. Energy & E-Mobility (OTH Regensburg). Still working student at LPlusR. Main project: shuttle control using Siemens PLC (SCL).",
-    btn_projects:"View Portfolio", btn_contact:"Contact Me", btn_cv:"Download CV",
-    scroll:"Scroll Down",
+    // HERO
+    hero_name: "Abiathar Mekem",
+    hero_role: "Electrical Engineer • Energy Networks • Automation • Electromobility",
+    hero_text:
+      "Exploring the intersection of electrical engineering, energy networks, and electromobility through hands-on projects and practical engineering applications. Passionate about designing and optimizing intelligent energy systems, automation solutions, and sustainable technologies that support the transition toward modern and efficient electrical infrastructures.",
+    btn_projects: "View Portfolio",
+    btn_contact: "Contact Me",
+    scroll: "Scroll Down",
 
-    about_title:"About Me",
-    about_p1:"I’m an electrical engineer focused on industrial automation and energy systems. I enjoy building robust PLC logic, analyzing data, and delivering reliable solutions in industrial environments.",
-    about_p2:"I completed my Bachelor at OTH Regensburg and I’m now doing a Master in Energy & E-Mobility. I’m still working as a working student at LPlusR, where I also developed my shuttle control topic.",
-    stat_degree:"B.Eng", stat_degree_lbl:"Bachelor Completed",
-    stat_master:"M.Sc", stat_master_lbl:"Master Ongoing",
-    stat_focus:"PLC", stat_focus_lbl:"Main Focus",
+    // ABOUT
+    about_title: "About Me",
+    about_p1:
+      "I hold a Bachelor's degree in Electrical and Information Engineering, specialized in Energy and Automation Technology. I am currently pursuing a Master's degree in Energy Networks and Electromobility to deepen my expertise in modern energy systems, power grids, and sustainable mobility solutions.",
+    about_p2:
+      "My interests focus on developing and optimizing intelligent energy infrastructures, automation systems, and innovative technologies that enable reliable, efficient, and sustainable power networks. Through academic projects and practical engineering work, I enjoy turning theory into real-world solutions.",
+    about_p3:
+      "As a future electrical engineer, I continuously expand my technical skills, explore new tools, and strengthen my ability to design robust and efficient energy solutions. This portfolio reflects my journey always evolving driven by passion and purpose.",
 
-    skills_title:"Skills & Expertise",
-    skills_col1:"Development", skills_col2:"Engineering", skills_col3:"Tools",
+    // STATS
+    stat_degree: "B.Eng",
+    stat_degree_lbl: "Energy & Automation ",
+    stat_master: "M.Sc",
+    stat_master_lbl: "Energy Networks & Electromobility ",
+    stat_years: "1+",
+    stat_years_lbl: "Years Experience",
+    stat_projects: "5+",
+    stat_projects_lbl: "Projects Completed",
 
-    showcase_title:"Portfolio Showcase",
-    showcase_sub:"Discover my certificates, achievements, and technical skills.",
-    tab_awards:"Awards & Achievements", tab_certs:"Certificates", tab_tech:"Technical skills",
+    // SKILLS
+    skills_title: "Skills & Expertise",
+    skills_col1: "Development",
+    skills_col2: "Engineering",
+    skills_col3: "Tools",
 
-    exp_title:"Experience",
+    // SHOWCASE
+    showcase_title: "Portfolio Showcase",
+    showcase_sub: "Discover my certificates, achievements, and technical skills.",
+    tab_awards: "Achievements",
+    tab_certs: "Certificates",
+    tab_tech: "Technical skills",
 
-    contact_title:"Get In Touch",
-    contact_intro:"I’m always interested in hearing about new projects and opportunities. Whether you have a question or just want to say hello, feel free to reach out!",
-    lbl_email:"Email", lbl_location:"Location", lbl_linkedin:"LinkedIn", lbl_cv:"CV",
-    val_location:"Regensburg, Germany", val_linkedin:"Abiathar Mekem", val_cv:"Open CV",
-    f_name:"Name", f_email:"Email", f_subject:"Subject", f_message:"Message", f_send:"Send Message",
-    ph_name:"Your name", ph_email:"Your email", ph_subject:"Subject", ph_message:"Your message",
-    f_note:"This form opens your email app (mailto). We can connect a real backend later.",
-    rights:"All Rights Reserved.",
-    tagline:"Electrical Engineer • Energy • Automation • Data",
+    // EXPERIENCE
+    exp_title: "Experience",
+
+    // CONTACT
+    contact_title: "Get In Touch",
+    contact_intro:
+      "I’m always interested in hearing about new projects and opportunities. Whether you have a question or just want to say hello, feel free to reach out!",
+    lbl_email: "Email",
+    lbl_location: "Location",
+    lbl_linkedin: "LinkedIn",
+    val_location: "Regensburg, Germany",
+    val_linkedin: "Abiathar Mekem",
+    f_name: "Name",
+    f_email: "Email",
+    f_subject: "Subject",
+    f_message: "Message",
+    f_send: "Send Message",
+    ph_name: "Your name",
+    ph_email: "Your email",
+    ph_subject: "Subject",
+    ph_message: "Your message",
+
+    // FOOTER
+    rights: "All Rights Reserved.",
+    tagline: "Electrical Engineer • Energy • Automation • Electromobility"
   }
 };
 
